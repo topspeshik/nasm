@@ -5,6 +5,18 @@
     push eax
 %endmacro
 
+%macro minus 0
+    push '-'
+    mov edx, 1
+    mov ecx, esp
+    mov ebx, 1
+    mov eax, 4
+    add esp, 4 
+    int 0x80
+    popd
+    
+%endmacro
+
 %macro popd 0
     pop eax
     pop ebx
@@ -74,13 +86,16 @@ _arrY:
     jl _arrY
     mov ebx, 0
      
-    sub eax, [xSum]
+    sub [xSum], eax
+    mov eax, [xSum]
     cmp eax, 0
     jl _negative
     mov ebx, ylen/4
     div ebx
+    
     dprint 
     mov     eax, 1
+    mov     ebx, 0   
     int     0x80
 
     
@@ -88,15 +103,18 @@ _negative:
     neg eax
     mov ebx, ylen/4
     div ebx
+    minus 
+
     dprint 
     
     mov     eax, 1
+    mov     ebx, 0   
     int     0x80
 
 section .data
     x dd 5, 3, 2, 6, 1, 7, 4
     y dd 0, 10, 1, 9, 2, 8, 5
-    xlen equ ($ - x) / 2 ; мне не очень понятно почему здесь длина получается 56(если не делить на 2), а в ylen все нормально
+    xlen equ ($ - x) / 2 
     ylen equ ($ - y) 
 
 section .bss
